@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { usePhotos } from '../../hooks/usePhotos';
 import { useGiftConfig } from '../../context/GiftConfigContext';
@@ -45,6 +45,15 @@ export const AdminDashboard: React.FC = () => {
 
   const replaceFileInputRef = useRef<HTMLInputElement | null>(null);
   const [targetReplacePhoto, setTargetReplacePhoto] = useState<{ id: string; storagePath: string } | null>(null);
+
+  useEffect(() => {
+    document.documentElement.style.overflow = 'auto';
+    document.body.style.overflow = 'auto';
+    return () => {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    };
+  }, []);
 
   if (authLoading) {
     return (
@@ -127,7 +136,7 @@ export const AdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pastel-blush via-white to-pastel-pink/20 pb-16">
+    <div className="min-h-screen bg-gradient-to-br from-pastel-blush via-white to-pastel-pink/20 pb-16 overflow-y-auto">
       <Navbar />
 
       {/* Hidden File Input for instant photo replacement */}

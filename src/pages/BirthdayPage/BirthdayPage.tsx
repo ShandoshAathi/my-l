@@ -34,6 +34,15 @@ export const BirthdayPage: React.FC = () => {
   const musicControls = useProceduralMusic(config.music);
   const { theme } = useTheme();
 
+  React.useEffect(() => {
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    };
+  }, []);
+
   const handleOpenSurprise = () => {
     setIsSurpriseOpen(true);
     setIsBlooming(true);
