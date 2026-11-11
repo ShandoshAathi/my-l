@@ -117,6 +117,7 @@ export async function saveGiftSurprise(config: GiftConfig): Promise<GiftConfig> 
   try {
     const { data: userResp } = await supabase.auth.getUser();
     const userId = userResp?.user?.id;
+    const isValidUuid = typeof userId === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId);
 
     const payload = {
       slug: config.slug.trim().toLowerCase(),
@@ -124,7 +125,7 @@ export async function saveGiftSurprise(config: GiftConfig): Promise<GiftConfig> 
       passcode: config.passcode ? config.passcode.trim() : null,
       passcode_hint: config.passcodeHint || null,
       config: config,
-      created_by: userId
+      created_by: isValidUuid ? userId : null
     };
 
     const { data, error } = await supabase
@@ -134,8 +135,8 @@ export async function saveGiftSurprise(config: GiftConfig): Promise<GiftConfig> 
       .single();
 
     if (error) {
-      console.warn('Supabase gift_surprises save error (using local storage):', error.message);
-      return config;
+      console.error('Supabase gift_surprises save error:', error.message);
+      throw new Error(`Failed to save to Supabase: ${error.message}`);
     }
 
     return {
@@ -143,8 +144,8 @@ export async function saveGiftSurprise(config: GiftConfig): Promise<GiftConfig> 
       id: data?.id
     };
   } catch (err) {
-    console.warn('Failed to save to Supabase, local storage preserved:', err);
-    return config;
+    console.error('Failed to save to Supabase:', err);
+    throw err;
   }
 }
 

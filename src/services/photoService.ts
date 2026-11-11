@@ -126,21 +126,35 @@ export async function fetchPhotos(): Promise<BirthdayPhoto[]> {
       return getLocalStoredPhotos();
     }
 
-    // Resolve signed URLs for each private photo
+    // Resolve URLs for each photo
     const photosWithUrls = await Promise.all(
       data.map(async (photo) => {
         try {
-          const { data: signedData, error: signedError } = await supabase.storage
-            .from(PRIVATE_BUCKET)
-            .createSignedUrl(photo.storage_path, 3600);
-
-          if (signedError || !signedData?.signedUrl) {
-            return photo;
+          if (photo.storage_path.startsWith('http://') || photo.storage_path.startsWith('https://')) {
+            return {
+              ...photo,
+              signed_url: photo.storage_path
+            };
           }
+
+          const { data: publicData } = supabase.storage
+            .from(PRIVATE_BUCKET)
+            .getPublicUrl(photo.storage_path);
+
+          if (publicData?.publicUrl) {
+            return {
+              ...photo,
+              signed_url: publicData.publicUrl
+            };
+          }
+
+          const { data: signedData } = await supabase.storage
+            .from(PRIVATE_BUCKET)
+            .createSignedUrl(photo.storage_path, 86400 * 30);
 
           return {
             ...photo,
-            signed_url: signedData.signedUrl
+            signed_url: signedData?.signedUrl || photo.storage_path
           };
         } catch {
           return photo;
@@ -210,6 +224,7 @@ export async function uploadPhoto(file: File, title: string): Promise<BirthdayPh
 
   const { data: userResp } = await supabase.auth.getUser();
   const userId = userResp?.user?.id;
+  const isValidUuid = typeof userId === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId);
 
   const { data: insertData, error: dbError } = await supabase
     .from('birthday_photos')
@@ -217,7 +232,7 @@ export async function uploadPhoto(file: File, title: string): Promise<BirthdayPh
       {
         title: title.trim() || 'Sweet Memory ♡',
         storage_path: uniquePath,
-        created_by: userId
+        created_by: isValidUuid ? userId : null
       }
     ])
     .select()
@@ -228,13 +243,13 @@ export async function uploadPhoto(file: File, title: string): Promise<BirthdayPh
     throw new Error(`Database record creation failed: ${dbError.message}`);
   }
 
-  const { data: signedData } = await supabase.storage
+  const { data: publicData } = supabase.storage
     .from(PRIVATE_BUCKET)
-    .createSignedUrl(uniquePath, 3600);
+    .getPublicUrl(uniquePath);
 
   return {
     ...insertData,
-    signed_url: signedData?.signedUrl
+    signed_url: publicData?.publicUrl || uniquePath
   };
 }
 
@@ -262,6 +277,7 @@ export async function addPhotoByUrl(url: string, title: string): Promise<Birthda
   try {
     const { data: userResp } = await supabase.auth.getUser();
     const userId = userResp?.user?.id;
+    const isValidUuid = typeof userId === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId);
 
     const { data: insertData, error: dbError } = await supabase
       .from('birthday_photos')
@@ -269,7 +285,7 @@ export async function addPhotoByUrl(url: string, title: string): Promise<Birthda
         {
           title: title.trim() || 'Sweet Memory ♡',
           storage_path: cleanUrl,
-          created_by: userId
+          created_by: isValidUuid ? userId : null
         }
       ])
       .select()

@@ -13,7 +13,8 @@ import {
   Heart,
   Globe,
   Cloud,
-  Smartphone
+  Smartphone,
+  AlertCircle
 } from 'lucide-react';
 
 interface GiftLinkManagerProps {
@@ -33,6 +34,7 @@ export const GiftLinkManager: React.FC<GiftLinkManagerProps> = ({
   const [copied, setCopied] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   // Allow custom base URL override if testing on phone over LAN or deployed on Vercel
   const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
@@ -70,12 +72,15 @@ export const GiftLinkManager: React.FC<GiftLinkManagerProps> = ({
   const handleSaveAndGenerate = async () => {
     setIsSaving(true);
     setSaveSuccess(false);
+    setSaveError(null);
     try {
       await onSave();
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
-    } catch (e) {
+    } catch (e: unknown) {
       console.error(e);
+      const msg = e instanceof Error ? e.message : 'Failed to save to Supabase';
+      setSaveError(msg);
     } finally {
       setIsSaving(false);
     }
@@ -355,7 +360,14 @@ export const GiftLinkManager: React.FC<GiftLinkManagerProps> = ({
           {saveSuccess && (
             <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 animate-fade-in">
               <Check className="h-3.5 w-3.5" />
-              Gift Link Activated!
+              Gift Link Activated in Supabase!
+            </span>
+          )}
+
+          {saveError && (
+            <span className="inline-flex items-center gap-1 text-xs font-bold text-red-600 bg-red-50 px-3 py-1.5 rounded-xl border border-red-200">
+              <AlertCircle className="h-3.5 w-3.5" />
+              {saveError}
             </span>
           )}
         </div>
