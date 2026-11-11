@@ -34,7 +34,7 @@ export const AdminDashboard: React.FC = () => {
   const { config, updateConfig, saveConfig } = useGiftConfig();
   const { themeId, setThemeId } = useTheme();
 
-  const [activeTab, setActiveTab] = useState<AdminTab>('share');
+  const [activeTab, setActiveTab] = useState<AdminTab>('photos');
 
   // Photo actions
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -159,9 +159,6 @@ export const AdminDashboard: React.FC = () => {
             <h1 className="font-heading text-2xl sm:text-3xl font-bold text-gray-800">
               Personalized Surprise Studio
             </h1>
-            <p className="font-anime text-xs sm:text-sm text-gray-500">
-              Crafting romantic world for <span className="font-bold text-pastel-rose">{config.recipientName || 'My Princess'}</span> • Passkey: <span className="font-mono font-bold text-pastel-purple">{config.passcode || '143'}</span>
-            </p>
           </div>
 
           <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -200,18 +197,6 @@ export const AdminDashboard: React.FC = () => {
         {/* Tab Navigation Bar */}
         <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-6 scrollbar-none">
           <button
-            onClick={() => setActiveTab('share')}
-            className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl font-bold text-xs sm:text-sm whitespace-nowrap transition-all ${
-              activeTab === 'share'
-                ? 'bg-gradient-to-r from-pastel-rose to-pastel-purple text-white shadow-glow-rose'
-                : 'bg-white/80 text-gray-600 hover:bg-white border border-pastel-pink/40'
-            }`}
-          >
-            <Share2 className="h-4 w-4" />
-            <span>1. Secret Link & Passcode</span>
-          </button>
-
-          <button
             onClick={() => setActiveTab('photos')}
             className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl font-bold text-xs sm:text-sm whitespace-nowrap transition-all ${
               activeTab === 'photos'
@@ -220,7 +205,7 @@ export const AdminDashboard: React.FC = () => {
             }`}
           >
             <ImageIcon className="h-4 w-4" />
-            <span>2. Photos ({photos.length}) & Replace</span>
+            <span>1. Photos ({photos.length}) & Replace</span>
           </button>
 
           <button
@@ -232,7 +217,7 @@ export const AdminDashboard: React.FC = () => {
             }`}
           >
             <Music className="h-4 w-4" />
-            <span>3. Romantic Song / Audio</span>
+            <span>2. Romantic Song / Audio</span>
           </button>
 
           <button
@@ -244,7 +229,7 @@ export const AdminDashboard: React.FC = () => {
             }`}
           >
             <Heart className="h-4 w-4" />
-            <span>4. Love Letter & Messages</span>
+            <span>3. Love Letter & Messages</span>
           </button>
 
           <button
@@ -256,19 +241,21 @@ export const AdminDashboard: React.FC = () => {
             }`}
           >
             <Palette className="h-4 w-4" />
-            <span>5. World Theme</span>
+            <span>4. World Theme</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('share')}
+            className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl font-bold text-xs sm:text-sm whitespace-nowrap transition-all ${
+              activeTab === 'share'
+                ? 'bg-gradient-to-r from-pastel-rose to-pastel-purple text-white shadow-glow-rose'
+                : 'bg-white/80 text-gray-600 hover:bg-white border border-pastel-pink/40'
+            }`}
+          >
+            <Share2 className="h-4 w-4" />
+            <span>5. Secret Link & Passcode</span>
           </button>
         </div>
-
-        {/* TAB 1: GIFT LINK & SECRET PASSCODE */}
-        {activeTab === 'share' && (
-          <GiftLinkManager
-            config={config}
-            photos={photos}
-            onUpdateConfig={updateConfig}
-            onSave={saveConfig}
-          />
-        )}
 
         {/* TAB 2: PHOTO VAULT & REPLACEMENT */}
         {activeTab === 'photos' && (
@@ -437,7 +424,7 @@ export const AdminDashboard: React.FC = () => {
           />
         )}
 
-        {/* TAB 5: WORLD THEME SELECTION */}
+        {/* TAB 4: WORLD THEME SELECTION */}
         {activeTab === 'theme' && (
           <div className="rounded-3xl glass-card p-6 sm:p-8 shadow-glass border border-pastel-pink/50">
             <h3 className="font-heading text-xl font-bold text-gray-800 mb-1 flex items-center gap-2">
@@ -485,6 +472,16 @@ export const AdminDashboard: React.FC = () => {
               })}
             </div>
           </div>
+        )}
+
+        {/* TAB 5: GIFT LINK & SECRET PASSCODE */}
+        {activeTab === 'share' && (
+          <GiftLinkManager
+            config={config}
+            photos={photos}
+            onUpdateConfig={updateConfig}
+            onSave={saveConfig}
+          />
         )}
       </main>
     </div>
