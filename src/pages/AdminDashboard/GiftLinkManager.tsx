@@ -29,7 +29,7 @@ export const GiftLinkManager: React.FC<GiftLinkManagerProps> = ({
   onUpdateConfig,
   onSave
 }) => {
-  const [linkType, setLinkType] = useState<'portable' | 'cloud'>('portable');
+  const [linkType, setLinkType] = useState<'cloud' | 'portable'>('cloud');
   const [copied, setCopied] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -127,29 +127,6 @@ export const GiftLinkManager: React.FC<GiftLinkManagerProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
           <button
             type="button"
-            onClick={() => setLinkType('portable')}
-            className={`p-4 rounded-2xl border text-left transition-all ${
-              linkType === 'portable'
-                ? 'border-pastel-rose bg-white shadow-sm ring-2 ring-pastel-rose/30'
-                : 'border-pastel-pink/40 bg-white/60 hover:bg-white'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-1">
-              <span className="font-bold text-xs sm:text-sm text-gray-800 flex items-center gap-1.5">
-                <Globe className="h-4 w-4 text-pastel-rose" />
-                <span>Universal Portable Link</span>
-              </span>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">
-                Works on Any Device
-              </span>
-            </div>
-            <p className="font-anime text-[11px] text-gray-500">
-              Encodes your photos, love letters, songs & secret password into the URL. Opens on any phone/device worldwide with 0 database needed!
-            </p>
-          </button>
-
-          <button
-            type="button"
             onClick={() => setLinkType('cloud')}
             className={`p-4 rounded-2xl border text-left transition-all ${
               linkType === 'cloud'
@@ -160,14 +137,37 @@ export const GiftLinkManager: React.FC<GiftLinkManagerProps> = ({
             <div className="flex items-center justify-between mb-1">
               <span className="font-bold text-xs sm:text-sm text-gray-800 flex items-center gap-1.5">
                 <Cloud className="h-4 w-4 text-pastel-rose" />
-                <span>Short Cloud Slug Link</span>
+                <span>Short Clean Link</span>
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-pastel-pink/40 text-pastel-rose text-[10px] font-bold">
-                Via Supabase
+              <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">
+                Recommended • Short
               </span>
             </div>
             <p className="font-anime text-[11px] text-gray-500">
-              Clean short URL e.g. <code className="text-pastel-rose">/?gift={config.slug}</code>. Syncs with your Supabase PostgreSQL database.
+              Clean short URL (e.g. <code className="text-pastel-rose font-bold">/gift?gift={config.slug}</code>). Perfect for sharing on WhatsApp and social media.
+            </p>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setLinkType('portable')}
+            className={`p-4 rounded-2xl border text-left transition-all ${
+              linkType === 'portable'
+                ? 'border-pastel-rose bg-white shadow-sm ring-2 ring-pastel-rose/30'
+                : 'border-pastel-pink/40 bg-white/60 hover:bg-white'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-bold text-xs sm:text-sm text-gray-800 flex items-center gap-1.5">
+                <Globe className="h-4 w-4 text-pastel-rose" />
+                <span>Full Offline Link</span>
+              </span>
+              <span className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 text-[10px] font-bold">
+                Long URL
+              </span>
+            </div>
+            <p className="font-anime text-[11px] text-gray-500">
+              Encodes full data directly inside the URL without database. Note: This creates a very long link.
             </p>
           </button>
         </div>

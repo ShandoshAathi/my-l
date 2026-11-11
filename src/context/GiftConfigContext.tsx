@@ -110,7 +110,33 @@ export const GiftConfigProvider: React.FC<{ children: ReactNode }> = ({ children
         }
       }
 
-      // 3. Fallback to locally stored admin configuration
+      // 3. Fallback: If no query params, check Supabase for saved gift
+      try {
+        const cloudDefault = await fetchGiftSurpriseBySlug('for-my-love');
+        if (cloudDefault) {
+          setConfig(cloudDefault);
+          if (cloudDefault.themeId) {
+            setThemeId(cloudDefault.themeId as ThemeId);
+          }
+          const hasPasscode = Boolean(
+            cloudDefault.passcode &&
+            cloudDefault.passcode.trim().length > 0 &&
+            cloudDefault.isPasscodeProtected
+          );
+          const isSessionUnlocked = sessionStorage.getItem('gift_unlocked_for-my-love') === 'true';
+          if (hasPasscode && !isSessionUnlocked) {
+            setIsLocked(true);
+          } else {
+            setIsLocked(false);
+          }
+          setIsLoading(false);
+          return;
+        }
+      } catch {
+        // Continue to local storage fallback
+      }
+
+      // 4. Fallback to locally stored admin configuration
       const stored = getStoredGiftConfig();
       setConfig(stored);
       if (stored.themeId) {
